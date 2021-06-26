@@ -30,7 +30,7 @@ pipeline{
         }
         stage('run'){
             steps{
-                sh "jupyter nbconveret --to notebook --execute VQGAN+CLIP.ipynb"
+                sh "jupyter nbconvert --to notebook --execute VQGAN+CLIP.ipynb"
             }
         }
     }
