@@ -5,7 +5,7 @@ pipeline{
         docker {
             image 'rocm/pytorch'
             label 'amdgpu'
-            args '-u 0 --device=/dev/kfd --device=/dev/dri --group-add=video --ipc=host --cap-add=SYS_PTRACE --security-opt seccomp=unconfined'
+            args '-u 0 --device=/dev/kfd --device=/dev/dri --group-add=video --ipc=host --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -p 8888:8888'
         }
     }
     stages{
@@ -16,7 +16,7 @@ pipeline{
         }
         stage('install dependencies'){
             steps{
-                sh "pip install jupyterlab jupyter ipywidgets nbconvert ftfy regex tqdm omegaconf pytorch-lightning ipython einops iprogress"
+                sh "pip install jupyterlab jupyter ipywidgets nbconvert ftfy regex tqdm omegaconf pytorch-lightning ipython einops iprogress jupyter_http_over_ws"
                 // Moving the training model download to a separate job so we don't have to waste bandwidth downloading every time
                 // sh "curl -L 'https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/files/?p=%2Fconfigs%2Fmodel.yaml&dl=1' > vqgan_imagenet_f16_1024.yaml"
                 // sh "curl -L 'https://heibox.uni-heidelberg.de/d/8088892a516d4e3baf92/files/?p=%2Fckpts%2Flast.ckpt&dl=1' > vqgan_imagenet_f16_1024.ckpt"
@@ -30,7 +30,9 @@ pipeline{
         }
         stage('run'){
             steps{
-                sh "jupyter nbconvert --to notebook --execute VQGAN+CLIP.ipynb"
+                //sh "jupyter nbconvert --to notebook --execute VQGAN+CLIP.ipynb"
+                sh "jupyter serverextension enable --py jupyter_http_over_ws"
+                sh "jupyter notebook   --NotebookApp.allow_origin='https://colab.research.google.com'   --port=8888   --NotebookApp.port_retries=0"
             }
         }
     }
