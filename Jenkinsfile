@@ -30,7 +30,7 @@ pipeline{
         }
         stage('run'){
             steps{
-                sh "jupyter nbconveret --to notebook --execute VQGAN+CLIP_(z+quantize_method).ipynb"
+                sh "jupyter nbconveret --to notebook --execute VQGAN+CLIP.ipynb"
             }
         }
     }
